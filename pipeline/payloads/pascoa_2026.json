@@ -1,0 +1,8 @@
+{
+  "task_name": "pascoa_coldbrew",
+  "task_date": "2026-03-26",
+  "platform_targets": ["instagram", "threads", "youtube"],
+  "skip_research": false,
+  "skip_image": false,
+  "skip_video": false
+}

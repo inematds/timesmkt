@@ -1,0 +1,214 @@
+import React from 'react';
+import { AbsoluteFill, Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
+
+/**
+ * Camera motion effects applied to background images.
+ * Simulates cinematic camera movements over still photos.
+ */
+
+export type CameraEffect =
+  | 'ken-burns-in'       // slow zoom in (intimate, emotional)
+  | 'ken-burns-out'      // slow zoom out (reveal, establishing)
+  | 'pan-left'           // pan from right to left
+  | 'pan-right'          // pan from left to right
+  | 'pan-up'             // pan from bottom to top (rising, hopeful)
+  | 'pan-down'           // pan from top to bottom (settling, calm)
+  | 'drift'              // subtle random drift (dreamy)
+  | 'parallax-zoom'      // zoom with slight vertical drift (dynamic)
+  | 'push-in'            // fast zoom toward subject (dramatic)
+  | 'pull-out'           // fast zoom away (reveal)
+  | 'tilt-shift'         // zoom with slight rotation (artistic)
+  | 'breathe'            // subtle scale pulse (living photo)
+  | 'none';              // static
+
+interface CameraMotionProps {
+  src: string;
+  effect?: CameraEffect;
+  intensity?: number; // 0.0 - 1.0, controls how much movement
+  children?: React.ReactNode;
+  overlay?: 'dark' | 'light' | 'warm' | 'cool' | 'sepia' | 'none';
+  overlayOpacity?: number;
+  blur?: number;
+}
+
+export const CameraMotion: React.FC<CameraMotionProps> = ({
+  src,
+  effect = 'ken-burns-in',
+  intensity = 0.5,
+  children,
+  overlay = 'dark',
+  overlayOpacity = 0.4,
+  blur = 0,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps, durationInFrames } = useVideoConfig();
+  const progress = frame / durationInFrames;
+  const i = intensity;
+
+  let scale = 1;
+  let translateX = 0;
+  let translateY = 0;
+  let rotate = 0;
+
+  switch (effect) {
+    case 'ken-burns-in':
+      scale = 1 + progress * 0.15 * i;
+      translateY = -progress * 20 * i;
+      break;
+
+    case 'ken-burns-out':
+      scale = 1.15 * i + 1 - progress * 0.15 * i;
+      translateY = progress * 15 * i;
+      break;
+
+    case 'pan-left':
+      scale = 1.1;
+      translateX = (0.5 - progress) * 80 * i;
+      break;
+
+    case 'pan-right':
+      scale = 1.1;
+      translateX = (progress - 0.5) * 80 * i;
+      break;
+
+    case 'pan-up':
+      scale = 1.1;
+      translateY = (0.5 - progress) * 60 * i;
+      break;
+
+    case 'pan-down':
+      scale = 1.1;
+      translateY = (progress - 0.5) * 60 * i;
+      break;
+
+    case 'drift':
+      scale = 1.08;
+      translateX = Math.sin(frame * 0.02) * 15 * i;
+      translateY = Math.cos(frame * 0.015) * 10 * i;
+      break;
+
+    case 'parallax-zoom':
+      scale = 1 + progress * 0.12 * i;
+      translateY = Math.sin(frame * 0.025) * 12 * i;
+      break;
+
+    case 'push-in': {
+      const pushProgress = spring({
+        frame,
+        fps,
+        config: { damping: 100, stiffness: 20, mass: 2 },
+      });
+      scale = 1 + pushProgress * 0.25 * i;
+      break;
+    }
+
+    case 'pull-out': {
+      const pullProgress = spring({
+        frame,
+        fps,
+        config: { damping: 100, stiffness: 20, mass: 2 },
+      });
+      scale = 1.25 * i + 1 - pullProgress * 0.25 * i;
+      break;
+    }
+
+    case 'tilt-shift':
+      scale = 1 + progress * 0.1 * i;
+      rotate = interpolate(progress, [0, 1], [-0.5 * i, 0.5 * i]);
+      break;
+
+    case 'breathe':
+      scale = 1.02 + Math.sin(frame * 0.05) * 0.02 * i;
+      break;
+
+    case 'none':
+    default:
+      scale = 1;
+      break;
+  }
+
+  const overlayColors: Record<string, string> = {
+    dark: `rgba(0,0,0,${overlayOpacity})`,
+    light: `rgba(255,255,255,${overlayOpacity})`,
+    warm: `rgba(75,46,26,${overlayOpacity})`,
+    cool: `rgba(100,140,180,${overlayOpacity})`,
+    sepia: `rgba(112,66,20,${overlayOpacity * 0.7})`,
+    none: 'transparent',
+  };
+
+  const filterStr = [
+    blur > 0 ? `blur(${blur}px)` : '',
+    overlay === 'sepia' ? 'saturate(0.5) sepia(0.3)' : '',
+  ].filter(Boolean).join(' ') || 'none';
+
+  return (
+    <AbsoluteFill style={{ overflow: 'hidden' }}>
+      {/* Background image with camera motion */}
+      <div style={{
+        position: 'absolute',
+        inset: '-10%', // overshoot to avoid edges during movement
+        transform: `scale(${scale}) translate(${translateX}px, ${translateY}px) rotate(${rotate}deg)`,
+        filter: filterStr,
+      }}>
+        <Img
+          src={src.startsWith('/') || src.startsWith('http') ? src : staticFile(src)}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      </div>
+
+      {/* Color overlay */}
+      {overlay !== 'none' && (
+        <AbsoluteFill style={{
+          backgroundColor: overlayColors[overlay],
+          zIndex: 2,
+        }} />
+      )}
+
+      {/* Children (text, product, etc.) */}
+      <AbsoluteFill style={{ zIndex: 10 }}>
+        {children}
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
+/**
+ * Choose camera effect based on scene type.
+ */
+export function getDefaultCameraEffect(sceneType: string): CameraEffect {
+  const map: Record<string, CameraEffect> = {
+    'hook': 'push-in',
+    'produto_em_acao': 'ken-burns-in',
+    'product_showcase': 'ken-burns-in',
+    'solution': 'pan-right',
+    'close_produto': 'ken-burns-in',
+    'benefit': 'parallax-zoom',
+    'conexao_emocional': 'drift',
+    'flashback_infancia': 'ken-burns-out',
+    'flashback_adolescencia': 'pan-left',
+    'presente': 'push-in',
+    'gift': 'push-in',
+    'cta': 'breathe',
+  };
+
+  for (const [key, effect] of Object.entries(map)) {
+    if (sceneType.includes(key)) return effect;
+  }
+  return 'ken-burns-in';
+}
+
+/**
+ * Choose overlay based on scene type.
+ */
+export function getDefaultOverlay(sceneType: string): 'dark' | 'light' | 'warm' | 'cool' | 'sepia' | 'none' {
+  if (sceneType.includes('hook')) return 'dark';
+  if (sceneType.includes('flashback') || sceneType.includes('memoria')) return 'sepia';
+  if (sceneType.includes('cta')) return 'light';
+  if (sceneType.includes('conexao') || sceneType.includes('benefit')) return 'warm';
+  if (sceneType.includes('produto') || sceneType.includes('product') || sceneType.includes('close')) return 'cool';
+  return 'dark';
+}

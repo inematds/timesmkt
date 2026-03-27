@@ -1,0 +1,17 @@
+{
+  "task_name": "dia_das_maes",
+  "task_date": "2026-05-10",
+  "platform_targets": ["instagram", "threads", "youtube"],
+  "skip_research": false,
+  "skip_image": false,
+  "skip_video": false,
+  "language": "pt-BR",
+  "campaign_brief": "Campanha de Dia das Mães para Cold Brew Coffee Co. Tema central: o momento de conexão entre mãe e filhos através do café. Cenas de interação afetuosa — mãe e filhos preparando cold brew juntos, conversas matinais, presentes. Tom emocional e acolhedor. Público: filhos adultos que querem presentear suas mães.",
+  "image_count": 8,
+  "image_formats": ["story_1080x1920", "carousel_1080x1080"],
+  "video_count": 2,
+  "video_briefs": [
+    "Vídeo 1: Mãe e filha preparando cold brew juntas numa manhã de domingo. Tom emocional, música suave. CTA: Presente perfeito para quem te deu tudo.",
+    "Vídeo 2: Montagem rápida de momentos mãe-filho ao longo dos anos, sempre com café. Ritmo dinâmico, trending. CTA: Cada gole é um abraço."
+  ]
+}

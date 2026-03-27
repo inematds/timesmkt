@@ -1,0 +1,25 @@
+{
+  "name": "cold-brew-coffee-co",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "render-ad": "node scripts/render-ad.js",
+    "pipeline:worker": "node pipeline/worker.js",
+    "pipeline:run": "node pipeline/orchestrator.js --file pipeline/payloads/coldbrew_demo.json",
+    "pipeline:run:payload": "node pipeline/orchestrator.js --payload",
+    "media:status": "node -e \"require('./media/providers').printStatus()\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.99.1",
+    "@tavily/core": "^0.7.2",
+    "bullmq": "^5.71.0",
+    "ioredis": "^5.10.0",
+    "playwright": "^1.58.2"
+  }
+}

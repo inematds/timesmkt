@@ -1,0 +1,305 @@
+{
+  "task_name": "test_job_payload_1",
+  "task_date": "2026-03-15",
+  "business": "Cold Brew Coffee Co.",
+  "description": "Full pipeline test — end-to-end execution with simulated uploads and no live posting.",
+  "simulate_uploads": false,
+  "dry_run": false,
+
+  "output_folder": "outputs/test_job_payload_1_20260315",
+
+  "platform_targets": ["instagram", "youtube"],
+
+  "knowledge_files": [
+    "knowledge/brand_identity.md",
+    "knowledge/product_campaign.md",
+    "knowledge/platform_guidelines.md"
+  ],
+
+  "pipeline": {
+
+    "research": {
+      "enabled": true,
+      "agent": "marketing-research-agent",
+      "skill": "skills/marketing-research-agent/SKILL.md",
+      "inputs": {
+        "niche": "cold brew coffee",
+        "target_audience": "busy professionals, millennials, morning routine seekers",
+        "campaign_goal": "brand awareness and conversions"
+      },
+      "tavily": {
+        "search_depth": "advanced",
+        "queries": [
+          "cold brew coffee market trends 2024 2025",
+          "cold brew coffee competitor marketing strategies",
+          "cold brew coffee audience pain points and desires",
+          "cold brew coffee best performing ad hooks and angles",
+          "cold brew coffee viral content topics social media"
+        ]
+      },
+      "outputs": {
+        "folder": "outputs/test_job_payload_1_20260315",
+        "files": [
+          "research_results.json",
+          "research_brief.md",
+          "interactive_report.html"
+        ]
+      }
+    },
+
+    "static_ad": {
+      "enabled": true,
+      "agent": "ad-creative-designer",
+      "skill": "skills/ad-creative-designer/SKILL.md",
+      "renderer": "nanobanana",
+      "inputs": {
+        "product": "Cold Brew Coffee",
+        "campaign_goal": "brand awareness",
+        "platform": "instagram",
+        "format": "square",
+        "dimensions": "1080x1080",
+        "layout_type": "lifestyle",
+        "assets_available": [
+          "coffee_glass.png",
+          "coffee_can.png",
+          "morning_cafe.png"
+        ],
+        "copy": {
+          "headline": "Your Morning, Upgraded.",
+          "subtext": "Smooth cold brew energy. Zero bitterness.",
+          "cta": "Shop Now"
+        },
+        "nanobanana_note": "Use a solid brand-color background for the product frame. Apply a circular CSS crop with a premium border. Do not tilt the product image."
+      },
+      "outputs": {
+        "folder": "outputs/test_job_payload_1_20260315/ads",
+        "files": [
+          "ad_layout.json",
+          "ad.html",
+          "styles.css",
+          "instagram_ad.png"
+        ]
+      }
+    },
+
+    "video_ad": {
+      "enabled": true,
+      "agent": "video-ad-specialist",
+      "skill": "skills/video-ad-specialist/SKILL.md",
+      "additional_skills": [
+        "skills/remotion-best-practices/SKILL.md"
+      ],
+      "inputs": {
+        "product": "Cold Brew Coffee",
+        "campaign_goal": "brand awareness",
+        "platform": "instagram_reels",
+        "format": "1080x1080",
+        "aspect_ratio": "1:1",
+        "video_length_seconds": 20,
+        "fps": 30,
+        "total_frames": 600,
+        "concept": "Your Morning, Upgraded",
+        "motion_style": "kurzgesagt_flat",
+        "custom_svgs": true,
+        "svg_assets_required": [
+          "alarm_clock",
+          "sun_arc",
+          "flat_human_tired",
+          "flat_human_alert",
+          "sparkle_burst",
+          "coffee_can_silhouette"
+        ],
+        "color_palette": {
+          "coffee_dark": "#2C1A0E",
+          "coffee_mid": "#4B2E1A",
+          "cold_blue": "#BFD9E8",
+          "amber": "#F5A623",
+          "off_white": "#F9F5F0"
+        },
+        "scenes": [
+          {
+            "id": "intro",
+            "frames": "0-60",
+            "time": "0-2s",
+            "type": "hook",
+            "description": "Dark background; animated alarm clock SVG rings; sun arc rises from bottom of frame",
+            "text_overlay": "Still dragging this morning?",
+            "svg_elements": ["alarm_clock", "sun_arc"]
+          },
+          {
+            "id": "struggle",
+            "frames": "60-120",
+            "time": "2-4s",
+            "type": "hook",
+            "description": "Flat illustrated character sits up, eyes half-open; desaturated grey tone across scene",
+            "text_overlay": "We've been there.",
+            "svg_elements": ["flat_human_tired"]
+          },
+          {
+            "id": "reveal",
+            "frames": "120-160",
+            "time": "4-5.3s",
+            "type": "product_showcase",
+            "description": "Coffee can SVG slides in from right with spring pop; scene color shifts to amber and cold blue",
+            "text_overlay": "Meet Cold Brew.",
+            "svg_elements": ["coffee_can_silhouette"]
+          },
+          {
+            "id": "energy_beat",
+            "frames": "160-520",
+            "time": "5.3-17.3s",
+            "type": "benefit",
+            "description": "Character perks up; sparkle/star SVGs burst outward from can; background fills to warm amber",
+            "text_overlay": "No bitterness. Pure boost.",
+            "svg_elements": ["flat_human_alert", "sparkle_burst", "coffee_can_silhouette"]
+          },
+          {
+            "id": "cta",
+            "frames": "520-600",
+            "time": "17.3-20s",
+            "type": "cta",
+            "description": "Off-white background; text animates in per-word: Upgrade Your Morning; can fades in below",
+            "text_overlay": "Upgrade Your Morning.",
+            "svg_elements": ["coffee_can_silhouette"]
+          }
+        ],
+        "animation_rules": {
+          "all_animation": "useCurrentFrame() + interpolate() only",
+          "easing": "spring overshoot for pops, ease-in-out for transitions",
+          "transitions": "wipe or slide — no hard cuts",
+          "typography": "animate per-word or per-letter — never static",
+          "no_external_css_keyframes": true,
+          "no_video_footage": true,
+          "no_mp4_clips": true
+        }
+      },
+      "remotion_config": {
+        "composition_id": "ColdBrewAd",
+        "width": 1080,
+        "height": 1080,
+        "fps": 30,
+        "duration_frames": 600,
+        "entry_point": "remotion-ad/src/index.ts"
+      },
+      "outputs": {
+        "folder": "outputs/test_job_payload_1_20260315/video",
+        "files": [
+          "scene_plan.json",
+          "video_ad.mp4"
+        ]
+      }
+    },
+
+    "copywriting": {
+      "enabled": true,
+      "agent": "copywriter-agent",
+      "skill": "skills/copywriter-agent/SKILL.md",
+      "inputs": {
+        "research_source": "outputs/test_job_payload_1_20260315/research_results.json",
+        "campaign_angle": "Upgrade Your Morning",
+        "topic": "morning productivity",
+        "key_benefit": "smooth energy without bitterness",
+        "platforms": ["instagram", "youtube"]
+      },
+      "platform_rules": {
+        "instagram": {
+          "structure": "hook → benefit → CTA → line_break → hashtags",
+          "max_sentences": 3,
+          "emojis": 2,
+          "hashtag_count": "3-5",
+          "cta_required": true
+        },
+        "youtube": {
+          "title_length": "60-70 characters",
+          "title_no_emojis": true,
+          "description_sentences": "2-3",
+          "description_ends_with_cta": true,
+          "tag_count": "5-8"
+        }
+      },
+      "outputs": {
+        "folder": "outputs/test_job_payload_1_20260315/copy",
+        "files": [
+          "instagram_caption.txt",
+          "threads_post.txt",
+          "youtube_metadata.json",
+          "copy_output.json"
+        ]
+      }
+    },
+
+    "distribution": {
+      "enabled": true,
+      "agent": "distribution-agent",
+      "skill": "skills/distribution-agent/SKILL.md",
+      "inputs": {
+        "media_sources": {
+          "instagram_image": "outputs/test_job_payload_1_20260315/ads/instagram_ad.png",
+          "youtube_video": "outputs/test_job_payload_1_20260315/video/video_ad.mp4"
+        },
+        "copy_sources": {
+          "instagram_caption": "outputs/test_job_payload_1_20260315/copy/instagram_caption.txt",
+          "threads_post": "outputs/test_job_payload_1_20260315/copy/threads_post.txt",
+          "youtube_metadata": "outputs/test_job_payload_1_20260315/copy/youtube_metadata.json"
+        },
+        "simulate_uploads": false,
+        "use_placeholder_urls": false,
+        "publish_immediately": false
+      },
+      "supabase": {
+        "bucket": "campaign-uploads",
+        "filename_convention": "<task_name>_<date>_<original_filename>",
+        "simulate": false
+      },
+      "scheduling_advisory": {
+        "instagram": {
+          "best_days": ["Tuesday", "Wednesday", "Thursday"],
+          "best_time": "7:00 AM – 9:00 AM or 6:00 PM – 8:00 PM",
+          "recommended_slot": "Tuesday 7:30 AM"
+        },
+        "youtube": {
+          "best_days": ["Thursday", "Friday", "Saturday"],
+          "best_time": "12:00 PM – 3:00 PM",
+          "recommended_slot": "Thursday 12:00 PM",
+          "note": "Upload 24h before target visibility window"
+        },
+        "threads": {
+          "best_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "best_time": "8:00 AM – 10:00 AM",
+          "recommended_slot": "Monday 8:30 AM"
+        }
+      },
+      "publish_gate": {
+        "trigger_phrase": "Run Publish test_job_payload_1 2026-03-15.md",
+        "auto_publish": false,
+        "note": "Posting will NOT execute without explicit user reference to the Publish MD file."
+      },
+      "outputs": {
+        "folder": "outputs/test_job_payload_1_20260315",
+        "files": [
+          "media_urls.json",
+          "Publish test_job_payload_1 2026-03-15.md"
+        ]
+      }
+    }
+
+  },
+
+  "execution_order": [
+    "research",
+    "static_ad",
+    "video_ad",
+    "copywriting",
+    "distribution"
+  ],
+
+  "completion_checklist": [
+    "Research outputs saved: research_results.json, research_brief.md, interactive_report.html",
+    "Static ad outputs saved: ad_layout.json, ad.html, styles.css, instagram_ad.png",
+    "Video ad outputs saved: scene_plan.json, video_ad.mp4",
+    "Copy outputs saved: instagram_caption.txt, threads_post.txt, youtube_metadata.json",
+    "Distribution outputs saved: media_urls.json, Publish test_job_payload_1 2026-03-15.md",
+    "No live social API posts executed (publish_immediately: false)",
+    "Real Supabase upload executed — public URLs stored in media_urls.json"
+  ]
+}
