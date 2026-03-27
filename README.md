@@ -210,10 +210,79 @@ Para publicar via API, é necessário:
 
 ## Supabase
 
-Necessário um projeto Supabase com:
+O projeto usa o Supabase **apenas como Storage** para hospedar os arquivos de mídia das campanhas. Não há tabelas no banco de dados — todos os metadados (captions, research, layouts, URLs) ficam em arquivos locais na pasta `outputs/`.
 
-1. Bucket de storage chamado `campaign-uploads` marcado como **público**
-2. `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` no `.env`
+### O que é armazenado
+
+O Agente de Distribuição faz upload de imagens (PNG) e vídeos (MP4) para o bucket e gera URLs públicas que são usadas para publicação via API (Instagram, YouTube).
+
+```
+Campanha gerada
+    ↓
+Upload de PNGs e MP4s → Supabase Storage (bucket: campaign-uploads)
+    ↓
+URLs públicas salvas em media_urls.json (local)
+    ↓
+URLs usadas para publicar via Instagram Graph API / YouTube Data API
+```
+
+### Configuração
+
+1. Criar um bucket chamado `campaign-uploads` marcado como **público**
+2. Adicionar no `.env`:
+
+```
+SUPABASE_URL=sua-url
+SUPABASE_SERVICE_ROLE_KEY=sua-key
+```
+
+### Exemplo de media_urls.json
+
+```json
+{
+  "campanha_carousel_01.png": "https://xxx.supabase.co/storage/v1/object/public/campaign-uploads/campanha_carousel_01.png",
+  "campanha_ad_01.mp4": "https://xxx.supabase.co/storage/v1/object/public/campaign-uploads/campanha_ad_01.mp4"
+}
+```
+
+### Publish MD — O guia de publicação
+
+Após o upload no Supabase, o Agente de Distribuição gera um arquivo `Publish <task_name> <date>.md` com tudo pronto para publicar. Esse arquivo funciona como um **guia completo da campanha** e contém:
+
+| Seção | O que tem |
+|---|---|
+| Status | Checklist por plataforma (Instagram, YouTube, Threads) |
+| Mídias hospedadas | Tabela com todos os arquivos, tipo, plataforma e URL pública |
+| Instagram — Carrossel | Slides na ordem exata + caption com hashtags |
+| Instagram — Stories | Sequência de stories com texto e instruções de formato |
+| YouTube | Título, descrição, tags e URL do vídeo por vídeo |
+| Threads | Texto pronto para colar (publicação manual) |
+| Agendamento | Calendário da semana com datas, horários e justificativa estratégica |
+| Instruções de execução | Como acionar a publicação via API |
+
+### Trava de publicação
+
+A publicação real nas APIs (Instagram Graph API, YouTube Data API) **só acontece quando o usuário referencia o Publish MD pelo nome**:
+
+```
+Executar Publish dia_das_maes 2026-05-10.md
+```
+
+Sem essa referência explícita, nenhuma chamada de API é feita. Isso garante que o usuário sempre revisa o conteúdo antes de publicar.
+
+```
+Pipeline completo
+    ↓
+Publish MD gerado com todo o conteúdo
+    ↓
+Usuário revisa captions, hashtags, agendamento
+    ↓
+Usuário referencia o arquivo pelo nome → publicação executa
+    ↓
+Instagram: Graph API (container → publish)
+YouTube: Data API (upload com título/descrição/tags)
+Threads: manual (sem API pública)
+```
 
 ---
 
